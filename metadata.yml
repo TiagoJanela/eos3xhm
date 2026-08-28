@@ -3,11 +3,11 @@ Slug: hades-oral-druglikeness
 Status: In progress
 Title: HADES Oral Drug-Likeness
 Description: Scores how closely a compound resembles an approved oral drug, with
-  0.63 the authors' recommended cutoff. HADES averages probabilities from five
+  0.63 the authors recommended cutoff. HADES averages probabilities from five 
   tree and boosting classifiers over 298 features combining Mordred descriptors,
-  ADMET-AI predictions and QED terms, trained on 1,177 approved oral drugs
-  against 5,307 nondrugs from ChEMBL, ZINC and GDB. Scores rise across clinical
-  phases and fall for orally toxic, small-ring and chemically implausible
+  ADMET-AI predictions and QED terms, trained on 1,177 approved oral drugs 
+  against 5,307 nondrugs from ChEMBL, ZINC and GDB. Scores rise across clinical 
+  phases and fall for orally toxic, small-ring and chemically implausible 
   structures. This model is based on a random-split provided by the authors.
 Deployment:
   - Local
@@ -22,7 +22,7 @@ Output:
   - Score
 Output Dimension: 1
 Output Consistency: Fixed
-Interpretation: Probability that a compound resembles an approved oral drug;
+Interpretation: Probability that a compound resembles an approved oral drug; 
   values above 0.63 indicate likely oral drug-likeness.
 Tag:
   - Drug-likeness
@@ -36,3 +36,4 @@ Publication: https://doi.org/10.1021/acs.jcim.5c02953
 Source Code: https://github.com/Narek-Petros-yan/HADES
 License: MIT
 Contributor: TiagoJanela
+Incorporation Date: '2026-08-28'
