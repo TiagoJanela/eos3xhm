@@ -3,44 +3,34 @@ Slug: hades-oral-druglikeness
 Status: In progress
 Title: HADES Oral Drug-Likeness
 Description: Scores how closely a compound resembles an approved oral drug, with
-  0.63 the authors recommended cutoff. HADES averages the probabilities of five 
-  tree and boosting classifiers trained on 1, 177 approved oral drugs against 5,
-  307 nondrugs from ChEMBL, ZINC and GDB, featurised with Mordred descriptors 
-  and ADMET-AI predictions. Scores rise across clinical phases and fall for 
-  orally toxic, small-ring and chemically implausible structures. It captures 
-  resemblance to approved oral drugs rather than general drug-likeness, and some
-  approved orals such as etravirine and pilocarpine score low.
+  0.63 the authors' recommended cutoff. HADES averages probabilities from five
+  tree and boosting classifiers over 298 features combining Mordred descriptors,
+  ADMET-AI predictions and QED terms, trained on 1,177 approved oral drugs
+  against 5,307 nondrugs from ChEMBL, ZINC and GDB. Scores rise across clinical
+  phases and fall for orally toxic, small-ring and chemically implausible
+  structures. This model is based on a random-split provided by the authors.
 Deployment:
   - Local
-  - Online
-Source: Local, Online
-Source Type: Internal, Replicated, External
-Task: Annotation, Representation, Sampling
-Subtask: Property calculation or prediction, Activity prediction, Featurization,
-  Projection, Similarity search, Generation
+Source: Local
+Source Type: External
+Task: Annotation
+Subtask: Property calculation or prediction
 Input:
   - Compound
 Input Dimension: 1
 Output:
-  - Value
   - Score
-  - Compound
-  - Text
 Output Dimension: 1
-Output Consistency: Fixed, Variable
-Interpretation: The output of this template model should be interpreted like 
-  this.
+Output Consistency: Fixed
+Interpretation: Probability that a compound resembles an approved oral drug;
+  values above 0.63 indicate likely oral drug-likeness.
 Tag:
   - Drug-likeness
-  - DrugBank
-  - ChEMBL
 Biomedical Area:
-  - Biomedical Area 1
-  - Biomedical Area 2
+  - Any
 Target Organism:
-  - Target Organism 1
-  - Target Organism 2
-Publication Type: Peer reviewed, Preprint, Other
+  - Any
+Publication Type: Peer reviewed
 Publication Year: 2026
 Publication: https://doi.org/10.1021/acs.jcim.5c02953
 Source Code: https://github.com/Narek-Petros-yan/HADES
