@@ -78,6 +78,13 @@ def predict(smiles_list):
         return scores
 
     features = Featurizer().featurize_many_smiles(valid_smiles)
+    # The featuriser drops anything it cannot standardise, which would silently
+    # misalign the scores against valid_positions. Fail loudly instead.
+    if len(features) != len(valid_smiles):
+        raise RuntimeError(
+            f"featuriser returned {len(features)} rows for {len(valid_smiles)} "
+            "parseable molecules; cannot align scores to inputs"
+        )
     features.columns = features.columns.astype(str)
     features[descriptor_columns] = features[descriptor_columns].apply(
         pd.to_numeric, errors="coerce"
