@@ -1,1 +1,2 @@
 name,type,direction,description
+hades_score,float,high,Probability that the molecule resembles an approved oral drug with 0.63 the recommended cutoff
