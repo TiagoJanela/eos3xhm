@@ -1,6 +1,25 @@
-python: "3.12"
+python: "3.10"
 commands:
-    - ["pip", "rdkit-pypi", "2022.3.1b1"]
-    - ["conda", "pandas", "1.3.5", "default"]
+    # rdkit is load-bearing at this exact version: 2026.3.x changes aromaticity and
+    # EState perception, which silently shifts 51 of the 253 Mordred descriptors the
+    # classifiers were fitted on. No error is raised, only wrong scores.
+    - ["pip", "rdkit", "2025.9.6"]
     - ["pip", "numpy", "1.26.4"]
+    - ["pip", "pandas", "2.1.4"]
+    # torch must stay below 2.6: from 2.6 onwards torch.load defaults to
+    # weights_only=True, and the chemprop checkpoints inside admet-ai carry an
+    # argparse.Namespace, so ADMETModel() fails to load. Installed before admet-ai
+    # so the CPU wheel wins over the default CUDA build.
+    - ["pip", "torch", "2.5.1+cpu", "--index-url", "https://download.pytorch.org/whl/cpu"]
+    - ["pip", "admet-ai", "1.3.1"]
+    - ["pip", "mordredcommunity", "2.0.7"]
+    # 1.7.2, not the 1.6.1 in the authors' HADES.yml: the published .pkl checkpoints
+    # were pickled with 1.7.2, and loading them under 1.6.1 raises
+    # InconsistentVersionWarning. Both versions score identically, but matching the
+    # pickles keeps the warning out of the logs.
+    - ["pip", "scikit-learn", "1.7.2"]
+    - ["pip", "xgboost", "3.2.0"]
+    - ["pip", "lightgbm", "4.7.0"]
+    - ["pip", "catboost", "1.2.10"]
+    - ["pip", "joblib", "1.5.3"]
     - ["pip", "ersilia-pack-utils", "0.1.5"]
