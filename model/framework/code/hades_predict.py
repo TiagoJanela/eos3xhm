@@ -10,6 +10,7 @@ they are not committed to the repository.
 """
 
 import os
+from functools import lru_cache
 
 import joblib
 import numpy as np
@@ -32,20 +33,41 @@ MODEL_NAMES = [
 ]
 
 
+@lru_cache(maxsize=1)
 def _load_descriptor_columns():
     """Return the 298 feature names, in the order the classifiers were fitted on.
 
     Upstream reads these from `train_test_saved/X_train.parquet` and drops its last
     column. Only the names are ever used, so they are stored here as plain text
     rather than shipping a 13 MB parquet of training data.
+
+    Cached, so a served model reads the file once per process rather than once
+    per request.
     """
     with open(DESCRIPTOR_COLUMNS_FILE) as f:
-        return [line.strip() for line in f if line.strip()]
+        return tuple(line.strip() for line in f if line.strip())
 
 
+@lru_cache(maxsize=1)
 def _load_models():
-    """Load the five fitted classifiers from the checkpoint directory."""
-    return [joblib.load(os.path.join(CHECKPOINT_DIR, f"{n}.pkl")) for n in MODEL_NAMES]
+    """Load the five fitted classifiers from the checkpoint directory.
+
+    Cached: the pickles total ~71 MB and deserialising them per request would
+    dominate runtime when the model is served rather than run as a one-shot CLI.
+    """
+    return tuple(
+        joblib.load(os.path.join(CHECKPOINT_DIR, f"{n}.pkl")) for n in MODEL_NAMES
+    )
+
+
+@lru_cache(maxsize=1)
+def _load_featurizer():
+    """Build the featuriser once.
+
+    Instantiating it constructs an ADMETModel, which loads five chemprop
+    checkpoints — the single most expensive step in a cold call.
+    """
+    return Featurizer()
 
 
 def predict(smiles_list):
@@ -62,7 +84,7 @@ def predict(smiles_list):
         One HADES score per input, in input order. Entries whose SMILES could not
         be parsed by RDKit are returned as NaN.
     """
-    descriptor_columns = _load_descriptor_columns()
+    descriptor_columns = list(_load_descriptor_columns())
 
     # Featurise only the parseable molecules, but remember where they came from:
     # the upstream featuriser silently drops invalid SMILES, which would shift the
@@ -77,7 +99,7 @@ def predict(smiles_list):
     if not valid_smiles:
         return scores
 
-    features = Featurizer().featurize_many_smiles(valid_smiles)
+    features = _load_featurizer().featurize_many_smiles(valid_smiles)
     # The featuriser drops anything it cannot standardise, which would silently
     # misalign the scores against valid_positions. Fail loudly instead.
     if len(features) != len(valid_smiles):
